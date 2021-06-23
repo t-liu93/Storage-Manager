@@ -15,7 +15,8 @@
         <n-input-number placeholder="数量" v-model:value="formValue.amount"/>
       </n-form-item>
       <n-form-item label="类别" path="checked">
-        <n-tree-select multiple checkable :options="categories" v-model:value="formValue.checked" />
+        <n-tree-select multiple checkable :options="categories" v-model:value="formValue.checked" style="min-width:150px"/>
+        <n-button text @click="manipulateCategory">没有合适的类别？点这里添加</n-button>
       </n-form-item>
       <n-form-item label="保质期" path="expire">
         <n-space>
@@ -57,7 +58,7 @@ export default defineComponent({
     NSwitch,
     NTreeSelect,
   },
-  name: 'AddComponent',
+  name: 'AddItemComponent',
   props: {
 
   },
@@ -107,6 +108,9 @@ export default defineComponent({
   methods: {
     backToHome() {
       this.$router.push('/')
+    },
+    manipulateCategory() {
+      this.$router.push('/manipulatecategory')
     },
     getCategory() {
       ax.post(document.location.origin + '/get', {

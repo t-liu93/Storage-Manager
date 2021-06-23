@@ -8,9 +8,6 @@
       <n-button type="error" @click="onScanningClick('delete')">删除</n-button>
     </n-space>
   </div>
-  <div v-if="isScanned" class="result">
-    Result: {{date}}
-  </div>
 </template>
 
 <script lang="ts">

@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../components/StorageManager.vue'
 import Scanner from '../components/Scanner.vue'
-import Add from '../components/Add.vue'
+import AddItem from '../components/AddItem.vue'
+import AddCategory from '../components/AddCategory.vue'
 const routes = [
     {
         path: '/',
@@ -14,10 +15,15 @@ const routes = [
         component: Scanner,
     },
     {
-        path: '/add',
-        name: 'Add',
-        component: Add,
+        path: '/additem',
+        name: 'AddItem',
+        component: AddItem,
     },
+    {
+        path: '/addcategory',
+        name: 'AddCategory',
+        component: AddCategory
+    }
 ]
 const router = createRouter({
     history: createWebHistory(),

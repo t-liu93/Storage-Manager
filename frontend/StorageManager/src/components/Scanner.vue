@@ -40,7 +40,7 @@ export default defineComponent({
       this.disableCamera()
       switch ( this.scanningMode ) {
         case 'add':
-          this.$router.push('/add')
+          this.$router.push('/additem')
           break;
         default:
           this.$router.push('/')

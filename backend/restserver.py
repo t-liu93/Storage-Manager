@@ -28,7 +28,7 @@ async def setItem(body: PostBodyBase):
     if body.type == 'category':
         return manager.addCategory(body.body)
     if body.type == 'item':
-        print(body)
+        return manager.addItem(body.body)
 
 @app.post("/get")
 async def getItem(body: PostBodyBase):

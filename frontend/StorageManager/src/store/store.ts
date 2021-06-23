@@ -9,11 +9,16 @@ const store = createStore({
   })],
   state() {
     return {
-      scannedResult: '',
-      isScanned: false,
-      isScanning: false,
-      scanningMode: '',
-      isEditing: false,
+      scanning: {
+        scannedResult: '',
+        isScanned: false,
+        isScanning: false,
+        scanningMode: '',
+      },
+      add: {
+        date: ''
+      },
+      isEditing: true,
     }
   },
   mutations: {
@@ -31,6 +36,9 @@ const store = createStore({
     },
     updateIsEditing(state: any, isEditing: boolean) {
       state.isEditing = isEditing
+    },
+    updateDate(state: any, date) {
+      state.date = date
     }
   }
 })

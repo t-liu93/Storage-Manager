@@ -9,7 +9,7 @@
     </n-space>
   </div>
   <div v-if="isScanned" class="result">
-    Result: {{scannedResult + scanningMode}}
+    Result: {{date}}
   </div>
 </template>
 
@@ -38,6 +38,7 @@ export default defineComponent({
     'isScanning',
     'scanningMode',
     'isEditing',
+    'date'
   ]),
   methods: {
     preventNav(event: any) {

@@ -1,16 +1,18 @@
 <template>
   <!-- <StorageManager msg="一个库管" /> -->
-  <router-view />
+  <n-message-provider>
+    <router-view />
+  </n-message-provider>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import StorageManager from './components/StorageManager.vue'
+import { NMessageProvider } from 'naive-ui'
 
 export default defineComponent({
   name: 'App',
   components: {
-    StorageManager
+    NMessageProvider
   }
 })
 </script>

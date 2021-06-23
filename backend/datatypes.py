@@ -14,12 +14,16 @@ class CategoryBase(BaseModel):
     name: str
     description: str
 
+class ExpireDateBase(BaseModel):
+    date: str
+    amount: int
+
 class ItemBase(BaseModel):
     uuid: str
     name: str
     amount: int
     category: List[str]
-    expireDate: str
+    expireDate: List[ExpireDateBase]
     lastModifiedDate: str
 
 class ServerResults(Enum):

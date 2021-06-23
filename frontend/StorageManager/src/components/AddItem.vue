@@ -16,7 +16,7 @@
       </n-form-item>
       <n-form-item label="类别" path="checked">
         <n-tree-select multiple checkable :options="categories" v-model:value="formValue.checked" style="min-width:150px"/>
-        <n-button text @click="manipulateCategory">没有合适的类别？点这里添加</n-button>
+        <n-button text @click="addCategory">没有合适的类别？点这里添加</n-button>
       </n-form-item>
       <n-form-item label="保质期" path="expire">
         <n-space>
@@ -109,8 +109,8 @@ export default defineComponent({
     backToHome() {
       this.$router.push('/')
     },
-    manipulateCategory() {
-      this.$router.push('/manipulatecategory')
+    addCategory() {
+      this.$router.push('/addcategory')
     },
     getCategory() {
       ax.post(document.location.origin + '/get', {
@@ -165,7 +165,10 @@ export default defineComponent({
           name: this.formValue.name,
           amount: this.formValue.amount,
           category: categories,
-          expireDate: expireDate,
+          expireDate: [{
+            date: expireDate,
+            amount: this.formValue.amount,
+          }],
           lastModifiedDate: ''
         }
       })

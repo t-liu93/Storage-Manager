@@ -56,57 +56,22 @@ class StorageManager():
         except Exception as e:
             print(str(e))
 
-    @staticmethod
-    def getExistingAmount(uuid: str) -> int:
-        dbConnection = StorageManager.__connectDb()
-        database = dbConnection[0]
-        cursor = dbConnection[1]
-        query = "select amount from items where uuid = %s"
-        values = (uuid,)
-        cursor.execute(query, values)
-        dbResults = cursor.fetchone()
-        database.close()
-        if dbResults is None:
-            return 0
-        else:
-            return int(dbResults[0])
-
-    @staticmethod
-    def getEarliestExpireDate(uuid: str, currentExpireDate: str) -> str:
-        current = datetime.strptime(currentExpireDate, "%Y-%m-%d").date()
-        dbConnection = StorageManager.__connectDb()
-        database = dbConnection[0]
-        cursor = dbConnection[1]
-        query = "select expire from items where uuid = %s"
-        values = (uuid,)
-        cursor.execute(query, values)
-        dbResults = cursor.fetchone()
-        database.close()
-        if dbResults is None:
-            return currentExpireDate
-        else:
-            existing = dbResults[0]
-            if current > existing:
-                return str(existing)
-            else:
-                return str(current)
-
-
     def addItem(self, itemRaw: dict()) -> ServerResults:
         item = ItemBase(**itemRaw)
         dbConnection = StorageManager.__connectDb()
         database = dbConnection[0]
         cursor = dbConnection[1]
-        existingAmount = StorageManager.getExistingAmount(item.uuid)
-        earliestExpire = StorageManager.getEarliestExpireDate(item.uuid, item.expireDate)
         try:
-            query = "insert into items (uuid, itemName, amount, expire, modifiedDate) values (%s, %s, %s, %s, %s) \
-                on duplicate key update amount=%s, expire=%s, modifiedDate=%s"
-            values = (item.uuid, item.name, existingAmount + item.amount,
-                    earliestExpire, str(datetime.today().date()),
-                    existingAmount + item.amount,
-                    earliestExpire,
+            query = "insert into items (uuid, itemName, amount, modifiedDate) values (%s, %s, %s, %s) \
+                on duplicate key update amount=amount+%s, modifiedDate=%s"
+            values = (item.uuid, item.name, item.amount,
+                    str(datetime.today().date()),
+                    item.amount,
                     str(datetime.today().date()))
+            cursor.execute(query, values)
+            query = "insert into itemsexpire (uuid, expire, amount) values (%s, %s, %s) \
+                on duplicate key update amount=amount+%s"
+            values = (item.uuid, item.expireDate[0].date, item.expireDate[0].amount, item.expireDate[0].amount)
             cursor.execute(query, values)
             for category in item.category:
                 query = "insert into itemscategory (uuid, category) values (%s, %s) \
@@ -125,8 +90,9 @@ class StorageManager():
         dbConnection = StorageManager.__connectDb()
         database = dbConnection[0]
         cursor = dbConnection[1]
-        query = "select items.*, itemscategory.category from items \
+        query = "select items.*, itemscategory.category, itemsexpire.expire, itemsexpire.amount from items \
             inner join itemscategory on items.uuid = itemscategory.uuid \
+            inner join itemsexpire on items.uuid = itemsexpire.uuid \
             where items.uuid = %s"
         values = (uuid,)
         cursor.execute(query, values)
@@ -134,8 +100,13 @@ class StorageManager():
         if len(itemResults) == 0:
             return None
         categories = []
+        expireDates = []
         for item in itemResults:
-            categories.append(item[5])
+            if item[4] not in categories:
+                categories.append(item[4])
+        for item in itemResults:
+            expireDate = {'date':str(item[5]), 'amount': item[6]}
+            expireDates.append(expireDate)
         database.close()
         itemResult = itemResults[0]
         resultRaw = {
@@ -143,7 +114,7 @@ class StorageManager():
             'name': itemResult[1],
             'amount': itemResult[2],
             'category': categories,
-            'expireDate': str(itemResult[3]),
+            'expireDate': expireDates,
             'lastModifiedDate': str(itemResult[4])
         }
         result = ItemBase(**resultRaw)

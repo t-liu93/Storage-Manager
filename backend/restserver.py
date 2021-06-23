@@ -34,3 +34,5 @@ async def setItem(body: PostBodyBase):
 async def getItem(body: PostBodyBase):
     if body.type == 'category':
         return manager.retrieveCategory()
+    if body.type == 'item':
+        return manager.retrieveItem(body.body['uuid'])

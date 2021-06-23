@@ -63,6 +63,7 @@ export default defineComponent({
   },
   mounted () {
     this.getCategory()
+    this.getExistingItem()
   },
   setup () {
     const message = useMessage()
@@ -125,6 +126,26 @@ export default defineComponent({
         this.categories.push(catDict)
       }
     },
+    getExistingItem() {
+      ax.post(document.location.origin + '/get', {
+        type: 'item',
+        body: {
+          uuid: this.scannedResult
+        }
+      })
+      .then(response => {
+        if (response.data != null) {
+          this.formValue.name = response.data.name;
+          if (response.data.expireDate === '2099-12-31') {
+            this.noExpire = true
+          }
+          for (let i = 0; i < response.data.category.length; i++) {
+            // @ts-ignore: Argument of type 'any' is not assignable to parameter of type 'never'.
+            this.formValue.checked.push(response.data.category[i])
+          }
+        }
+      })
+    },
     submit() {
       var categories: string[];
       categories = [];
@@ -132,6 +153,7 @@ export default defineComponent({
         categories.push(this.formValue.checked[i])
       }
       var date = new Date(this.formValue.expire)
+      let expireDate = (this.noExpire) ? '2099-12-31' : date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate()
       ax.post(document.location.origin + '/set', {
         type: 'item',
         body: {
@@ -139,7 +161,7 @@ export default defineComponent({
           name: this.formValue.name,
           amount: this.formValue.amount,
           category: categories,
-          expireDate: date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate(),
+          expireDate: expireDate,
           lastModifiedDate: ''
         }
       })
@@ -147,6 +169,8 @@ export default defineComponent({
         let serverResult = response.data[0]
         if (serverResult === ServerResult.OK) {
           this.success()
+        } else if (serverResult === ServerResult.RESULTS_UNKNOWN) {
+          this.error()
         }
       })
     },

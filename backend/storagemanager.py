@@ -93,23 +93,58 @@ class StorageManager():
 
 
     def addItem(self, itemRaw: dict()) -> ServerResults:
+        item = ItemBase(**itemRaw)
         dbConnection = StorageManager.__connectDb()
         database = dbConnection[0]
         cursor = dbConnection[1]
-        existingAmount = StorageManager.getExistingAmount(itemRaw['uuid'])
-        earliestExpire = StorageManager.getEarliestExpireDate(itemRaw['uuid'], itemRaw['expireDate'])
+        existingAmount = StorageManager.getExistingAmount(item.uuid)
+        earliestExpire = StorageManager.getEarliestExpireDate(item.uuid, item.expireDate)
         try:
             query = "insert into items (uuid, itemName, amount, expire, modifiedDate) values (%s, %s, %s, %s, %s) \
                 on duplicate key update amount=%s, expire=%s, modifiedDate=%s"
-            values = (itemRaw['uuid'], itemRaw['name'], existingAmount + itemRaw['amount'],
+            values = (item.uuid, item.name, existingAmount + item.amount,
                     earliestExpire, str(datetime.today().date()),
-                    existingAmount + itemRaw['amount'],
+                    existingAmount + item.amount,
                     earliestExpire,
                     str(datetime.today().date()))
             cursor.execute(query, values)
+            for category in item.category:
+                query = "insert into itemscategory (uuid, category) values (%s, %s) \
+                    on duplicate key update uuid=%s"
+                values = (item.uuid, category, item.uuid)
+                cursor.execute(query, values)
             database.commit()
             database.close()
         except Exception as e:
             print(e)
+            return ServerResults.RESULTS_UNKNOWN
 
         return ServerResults.OK
+
+    def retrieveItem(self, uuid: str) -> ItemBase:
+        dbConnection = StorageManager.__connectDb()
+        database = dbConnection[0]
+        cursor = dbConnection[1]
+        query = "select items.*, itemscategory.category from items \
+            inner join itemscategory on items.uuid = itemscategory.uuid \
+            where items.uuid = %s"
+        values = (uuid,)
+        cursor.execute(query, values)
+        itemResults = cursor.fetchall()
+        if len(itemResults) == 0:
+            return None
+        categories = []
+        for item in itemResults:
+            categories.append(item[5])
+        database.close()
+        itemResult = itemResults[0]
+        resultRaw = {
+            'uuid': itemResult[0],
+            'name': itemResult[1],
+            'amount': itemResult[2],
+            'category': categories,
+            'expireDate': str(itemResult[3]),
+            'lastModifiedDate': str(itemResult[4])
+        }
+        result = ItemBase(**resultRaw)
+        return result

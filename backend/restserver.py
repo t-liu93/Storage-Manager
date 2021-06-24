@@ -29,6 +29,8 @@ async def setItem(body: PostBodyBase):
         return manager.addCategory(body.body)
     if body.type == 'item':
         return manager.addItem(body.body)
+    if body.type == 'deleteitem':
+        return manager.deleteItem(body.body['uuid'])
 
 @app.post("/get")
 async def getItem(body: PostBodyBase):

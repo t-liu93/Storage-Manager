@@ -12,11 +12,16 @@
         <n-input placeholder="这是一个物品" v-model:value="formValue.name"/>
       </n-form-item>
       <n-form-item label="数量" path="amount">
-        <n-input-number placeholder="数量" v-model:value="formValue.amount"/>
+        <n-space>
+          <n-input-number placeholder="数量" v-model:value="formValue.amount"/>
+          <p>现有数量: {{existingAmount}}</p>
+        </n-space>
       </n-form-item>
       <n-form-item label="类别" path="checked">
-        <n-tree-select multiple checkable :options="categories" v-model:value="formValue.checked" style="min-width:150px"/>
-        <n-button text @click="addCategory">没有合适的类别？点这里添加</n-button>
+        <n-space>
+          <n-tree-select multiple checkable :options="categories" v-model:value="formValue.checked" style="min-width:150px"/>
+          <n-button text @click="addCategory">没有合适的类别？点这里添加</n-button>
+        </n-space>
       </n-form-item>
       <n-form-item label="保质期" path="expire">
         <n-space>
@@ -98,6 +103,7 @@ export default defineComponent({
     return {
       noExpire: false,
       categories: [],
+      existingAmount: 0,
     }
   },
   computed: mapState([
@@ -139,6 +145,7 @@ export default defineComponent({
       })
       .then(response => {
         if (response.data != null) {
+          this.existingAmount = response.data.amount;
           this.formValue.name = response.data.name;
           if (response.data.expireDate === '2099-12-31') {
             this.noExpire = true

@@ -169,3 +169,18 @@ class StorageManager():
             results.append(StorageManager.buildItemDict(items[itemKey][0], categories, expireDates))
 
         return results
+
+    def deleteItem(self, uuid: str) -> ServerResults:
+        dbConnection = StorageManager.__connectDb()
+        database = dbConnection[0]
+        cursor = dbConnection[1]
+        query = "delete from items where uuid = %s"
+        values = (uuid, )
+        cursor.execute(query, values)
+        query = "delete from itemscategory where uuid = %s"
+        cursor.execute(query, values)
+        query = "delete from itemsexpire where uuid = %s"
+        cursor.execute(query, values)
+        database.commit()
+        database.close()
+        return ServerResults.OK

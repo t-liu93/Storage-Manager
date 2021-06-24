@@ -176,6 +176,7 @@ export default defineComponent({
         let serverResult = response.data[0]
         if (serverResult === ServerResult.OK) {
           this.success()
+          this.$router.push('/')
         } else if (serverResult === ServerResult.RESULTS_UNKNOWN) {
           this.error()
         }

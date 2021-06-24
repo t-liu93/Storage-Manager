@@ -1,5 +1,6 @@
 <template>
   <h1>详细信息</h1>
+  <p>{{uuid}}</p>
   <div class='slot'>
   </div>
   <div class='mainButton'>

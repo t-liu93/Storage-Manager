@@ -27,6 +27,7 @@
         <n-space>
           <n-date-picker placeholder="2000-01-01" v-model:value="formValue.expire" type="date" :disabled="noExpire"/>
           <n-switch v-model:value="noExpire" />
+          <p>开启表示无保质期</p>
         </n-space>
       </n-form-item>
       <n-form-item label="备注" path="comments">
@@ -154,7 +155,8 @@ export default defineComponent({
         if (response.data != null) {
           this.existingAmount = response.data.amount;
           this.formValue.name = response.data.name;
-          if (response.data.expireDate === '2099-12-31') {
+          // @ts-ignore: Parameter 'o' implicitly has an 'any' type.
+          if (response.data.expireDate.some(o => o.date == '2099-12-31')) {
             this.noExpire = true
           }
           for (let i = 0; i < response.data.category.length; i++) {

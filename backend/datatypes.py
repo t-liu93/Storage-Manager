@@ -25,6 +25,7 @@ class ItemBase(BaseModel):
     category: List[str]
     expireDate: List[ExpireDateBase]
     lastModifiedDate: str
+    comments: str
 
 class ServerResults(Enum):
     OK = 0,

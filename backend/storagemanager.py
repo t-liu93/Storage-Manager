@@ -63,12 +63,14 @@ class StorageManager():
         database = dbConnection[0]
         cursor = dbConnection[1]
         try:
-            query = "insert into items (uuid, itemName, amount, modifiedDate) values (%s, %s, %s, %s) \
-                on duplicate key update amount=amount+%s, modifiedDate=%s"
+            query = "insert into items (uuid, itemName, amount, modifiedDate, comments) values (%s, %s, %s, %s, %s) \
+                on duplicate key update amount=amount+%s, modifiedDate=%s, comments=%s"
             values = (item.uuid, item.name, item.amount,
                     str(datetime.today().date()),
+                    item.comments,
                     item.amount,
-                    str(datetime.today().date()))
+                    str(datetime.today().date()),
+                    item.comments)
             cursor.execute(query, values)
             query = "insert into itemsexpire (uuid, expire, amount) values (%s, %s, %s) \
                 on duplicate key update amount=amount+%s"
@@ -112,7 +114,8 @@ class StorageManager():
             'amount': itemResult[2],
             'category': categories,
             'expireDate': expireDates,
-            'lastModifiedDate': str(itemResult[5])
+            'lastModifiedDate': str(itemResult[3]),
+            'comments': itemResult[7]
         }
         item = ItemBase(**resultRaw)
         return item
@@ -121,7 +124,9 @@ class StorageManager():
         dbConnection = StorageManager.__connectDb()
         database = dbConnection[0]
         cursor = dbConnection[1]
-        query = "select items.*, itemscategory.category, itemsexpire.expire, itemsexpire.amount from items \
+        query = "select items.uuid, items.itemName, items.amount, \
+                items.modifiedDate, itemscategory.category, itemsexpire.expire, itemsexpire.amount, \
+                items.comments from items \
             inner join itemscategory on items.uuid = itemscategory.uuid \
             inner join itemsexpire on items.uuid = itemsexpire.uuid \
             where items.uuid = %s"
@@ -152,7 +157,9 @@ class StorageManager():
         dbConnection = StorageManager.__connectDb()
         database = dbConnection[0]
         cursor = dbConnection[1]
-        query = "select items.*, itemscategory.category, itemsexpire.expire, itemsexpire.amount from items \
+        query = "select items.uuid, items.itemName, items.amount, \
+                items.modifiedDate, itemscategory.category, itemsexpire.expire, itemsexpire.amount, \
+                items.comments from items \
             inner join itemscategory on items.uuid = itemscategory.uuid \
             inner join itemsexpire on items.uuid = itemsexpire.uuid"
         values = ()

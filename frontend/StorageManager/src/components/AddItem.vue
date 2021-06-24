@@ -29,6 +29,9 @@
           <n-switch v-model:value="noExpire" />
         </n-space>
       </n-form-item>
+      <n-form-item label="备注" path="comments">
+        <n-input type="textarea" placeholder="写点备注吧" v-model:value="formValue.comments"/>
+      </n-form-item>
     </n-form>
   </div>
   <div class='mainButton'>
@@ -79,6 +82,7 @@ export default defineComponent({
         amount: 1,
         expire: Date.now(),
         checked: [],
+        comments: ''
       }),
       rules: {
         uuid: {
@@ -89,6 +93,9 @@ export default defineComponent({
         },
         amount: {
           required: true
+        },
+        comments: {
+          required: false
         }
       },
       success () {
@@ -176,7 +183,8 @@ export default defineComponent({
             date: expireDate,
             amount: this.formValue.amount,
           }],
-          lastModifiedDate: ''
+          lastModifiedDate: '',
+          comments: this.formValue.comments,
         }
       })
       .then(response => {

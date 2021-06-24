@@ -130,16 +130,14 @@ export default defineComponent({
         body: ''
       })
       .then(response => {
+        this.tagColumn.filterOptions = []
         for (let i = 0; i < response.data.length; i++) {
-          // @ts-ignore: Type 'any' is not assignable to type 'never'.
-          if (! this.tagColumn.filterOptions.includes(response.data[i].name)) {
-            this.tagColumn.filterOptions.push({
-              // @ts-ignore: Type 'any' is not assignable to type 'never'.
-              label: response.data[i].name,
-              // @ts-ignore: Type 'any' is not assignable to type 'never'.
-              value: response.data[i].name
-            })
-          }
+          this.tagColumn.filterOptions.push({
+            // @ts-ignore: Type 'any' is not assignable to type 'never'.
+            label: response.data[i].name,
+            // @ts-ignore: Type 'any' is not assignable to type 'never'.
+            value: response.data[i].name
+          })
         }
       })
     },

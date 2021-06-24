@@ -10,9 +10,11 @@ export default defineComponent({
   components: {
     StreamBarcodeReader,
   },
-  emits: ['scanned'],
-  name: 'StorageManager',
+  name: 'Scanner',
   props: {
+  },
+  beforeUnmount() {
+    this.disableCamera()
   },
   data () {
     return {
@@ -37,7 +39,6 @@ export default defineComponent({
       this.$store.commit('updateScannedResult', result)
       this.$store.commit('updateIsScanned', true)
       this.$store.commit('updateIsScanning', false)
-      this.disableCamera()
       switch ( this.scanningMode ) {
         case 'add':
           this.$router.push('/additem')

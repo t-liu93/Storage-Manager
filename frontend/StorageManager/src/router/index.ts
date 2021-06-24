@@ -3,11 +3,17 @@ import Home from '../components/StorageManager.vue'
 import Scanner from '../components/Scanner.vue'
 import AddItem from '../components/AddItem.vue'
 import AddCategory from '../components/AddCategory.vue'
+import Overview from '../components/Overview.vue'
 const routes = [
     {
         path: '/',
         name: 'Home',
         component: Home,
+    },
+    {
+        path: '/overview',
+        name: 'Overview',
+        component: Overview
     },
     {
         path: '/scan',

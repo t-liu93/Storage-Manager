@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from typing import List, Tuple
 from datetime import datetime
 import mysql.connector as sql
 
@@ -86,6 +87,36 @@ class StorageManager():
 
         return ServerResults.OK
 
+    @staticmethod
+    def buildItemCategoriesArray(dbItem: List) -> List[str]:
+        categories = []
+        for item in dbItem:
+            if item[4] not in categories:
+                categories.append(item[4])
+        return categories
+
+    @staticmethod
+    def buildItemExpiresArray(dbItem: List) -> List:
+        expireDates = []
+        for item in dbItem:
+            expireDate = {'date':str(item[5]), 'amount': item[6]}
+            if expireDate not in expireDates:
+                expireDates.append(expireDate)
+        return expireDates
+
+    @staticmethod
+    def buildItemDict(itemResult, categories, expireDates) -> ItemBase:
+        resultRaw = {
+            'uuid': itemResult[0],
+            'name': itemResult[1],
+            'amount': itemResult[2],
+            'category': categories,
+            'expireDate': expireDates,
+            'lastModifiedDate': str(itemResult[5])
+        }
+        item = ItemBase(**resultRaw)
+        return item
+
     def retrieveItem(self, uuid: str) -> ItemBase:
         dbConnection = StorageManager.__connectDb()
         database = dbConnection[0]
@@ -96,26 +127,45 @@ class StorageManager():
             where items.uuid = %s"
         values = (uuid,)
         cursor.execute(query, values)
-        itemResults = cursor.fetchall()
-        if len(itemResults) == 0:
-            return None
-        categories = []
-        expireDates = []
-        for item in itemResults:
-            if item[4] not in categories:
-                categories.append(item[4])
-        for item in itemResults:
-            expireDate = {'date':str(item[5]), 'amount': item[6]}
-            expireDates.append(expireDate)
+        dbResults = cursor.fetchall()
         database.close()
-        itemResult = itemResults[0]
-        resultRaw = {
-            'uuid': itemResult[0],
-            'name': itemResult[1],
-            'amount': itemResult[2],
-            'category': categories,
-            'expireDate': expireDates,
-            'lastModifiedDate': str(itemResult[4])
-        }
-        result = ItemBase(**resultRaw)
+        if len(dbResults) == 0:
+            return None
+        categories = StorageManager.buildItemCategoriesArray(dbResults)
+        expireDates = StorageManager.buildItemExpiresArray(dbResults)
+        itemResult = dbResults[0]
+
+        result = StorageManager.buildItemDict(itemResult, categories, expireDates)
         return result
+
+    @staticmethod
+    def separateAllItemsByUuid(itemsRaw: List) -> dict():
+        items = dict()
+        for itemRaw in itemsRaw:
+            if itemRaw[0] not in items.keys():
+                items[itemRaw[0]] = []
+        for itemRaw in itemsRaw:
+            items[itemRaw[0]].append(itemRaw)
+        return items
+
+    def retrieveAllItems(self) -> List[ItemBase]:
+        dbConnection = StorageManager.__connectDb()
+        database = dbConnection[0]
+        cursor = dbConnection[1]
+        query = "select items.*, itemscategory.category, itemsexpire.expire, itemsexpire.amount from items \
+            inner join itemscategory on items.uuid = itemscategory.uuid \
+            inner join itemsexpire on items.uuid = itemsexpire.uuid"
+        values = ()
+        cursor.execute(query, values)
+        dbResults = cursor.fetchall()
+        database.close()
+        if len(dbResults) == 0:
+            return None
+        results = []
+        items = StorageManager.separateAllItemsByUuid(dbResults)
+        for itemKey in items.keys():
+            categories = StorageManager.buildItemCategoriesArray(items[itemKey])
+            expireDates = StorageManager.buildItemExpiresArray(items[itemKey])
+            results.append(StorageManager.buildItemDict(items[itemKey][0], categories, expireDates))
+
+        return results

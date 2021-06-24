@@ -36,3 +36,5 @@ async def getItem(body: PostBodyBase):
         return manager.retrieveCategory()
     if body.type == 'item':
         return manager.retrieveItem(body.body['uuid'])
+    if body.type == 'allitem':
+        return manager.retrieveAllItems()

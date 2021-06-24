@@ -2,7 +2,7 @@
   <h1>一个库管</h1>
   <div class='mainButton'>
     <n-space>
-      <n-button type="info" @click="onScanningClick('lookup')">查询</n-button>
+      <n-button type="info" @click="overview">概览</n-button>
       <n-button type="primary" @click="onScanningClick('add')">添加</n-button>
       <n-button type="warning" @click="onScanningClick('modify')">改动</n-button>
       <n-button type="error" @click="onScanningClick('delete')">删除</n-button>
@@ -38,10 +38,19 @@ export default defineComponent({
     'date'
   ]),
   methods: {
-    preventNav(event: any) {
-      if (!this.isEditing) return
-      event.preventDefault()
-      event.returnValue = ""
+    disableCamera () {
+      const video = document.querySelector('video');
+      if (video != null) {
+        const mediaStream = video.srcObject;
+        if (mediaStream != null) {
+          // @ts-ignore: Property 'getTracks' does not exist on type 'MediaProvider'.
+          const tracks = mediaStream.getTracks();
+          tracks[0].stop();
+        }
+      }
+    },
+    overview() {
+      this.$router.push('/overview')
     },
     onScanningClick (mode: string) {
       this.$store.commit('updateScanningMode', mode)

@@ -73,6 +73,7 @@ export default defineComponent({
     }
   },
   data () {
+    const router = this.$router
     return {
       columns: [
         {
@@ -94,7 +95,7 @@ export default defineComponent({
               {
                 size: 'small',
                 onClick: () => {
-                  console.log(row.uuid)
+                  router.push({name: 'ItemDetail', params: {uuid: row.uuid}})
                 }
               },
               { default: () => '详细信息' }

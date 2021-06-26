@@ -1,0 +1,11 @@
+[Unit]
+Description=:Storage manager backend service
+
+[Service]
+Type=simple
+User=
+WorkingDirectory=
+ExecStart=/usr/bin/python3 -m uvicorn restserver:app --reload --port 8890
+
+[Install]
+WantedBy=multi-user.target

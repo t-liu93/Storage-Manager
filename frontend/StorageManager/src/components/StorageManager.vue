@@ -25,17 +25,15 @@ export default defineComponent({
   props: {
 
   },
+  setup() {
+  },
   data () {
     return {
     }
   },
   computed: mapState([
     'scannedResult',
-    'isScanned',
-    'isScanning',
     'scanningMode',
-    'isEditing',
-    'date'
   ]),
   methods: {
     disableCamera () {
@@ -54,9 +52,6 @@ export default defineComponent({
     },
     onScanningClick (mode: string) {
       this.$store.commit('updateScanningMode', mode)
-      this.$store.commit('updateIsScanned', false)
-      this.$store.commit('updateIsScanning', true)
-      this.$store.commit('updateIsEditing', true)
       this.$router.push('/scan')
     }
   }

@@ -6,7 +6,7 @@
       :rules="rules"
     >
       <n-form-item label="条码" path="uuid">
-        <n-input :disabled="true" :placeholder=uuid />
+        <n-input :disabled="true" :placeholder=detailUuid />
       </n-form-item>
       <n-form-item label="名称" path="name">
         <n-input placeholder="这是一个物品" v-model:value="formValue.name"/>
@@ -65,8 +65,10 @@ export default defineComponent({
   },
   name: 'ItemDetail',
   props: {
-    uuid: String
   },
+  computed: mapState([
+    'detailUuid'
+  ]),
   mounted () {
     this.getExistingItem()
   },
@@ -106,8 +108,6 @@ export default defineComponent({
       lastModified: '',
     }
   },
-  computed: mapState([
-  ]),
   methods: {
     back() {
       this.$router.go(-1)
@@ -116,7 +116,7 @@ export default defineComponent({
       ax.post(document.location.origin + '/set', {
         type: 'deleteitem',
         body: {
-          uuid: this.uuid
+          uuid: this.detailUuid
         }
       })
       .then(response => {
@@ -134,7 +134,7 @@ export default defineComponent({
       ax.post(document.location.origin + '/get', {
         type: 'item',
         body: {
-          uuid: this.uuid
+          uuid: this.detailUuid
         }
       })
       .then(response => {

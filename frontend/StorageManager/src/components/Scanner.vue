@@ -37,8 +37,6 @@ export default defineComponent({
     },
     onDecode (result: any) {
       this.$store.commit('updateScannedResult', result)
-      this.$store.commit('updateIsScanned', true)
-      this.$store.commit('updateIsScanning', false)
       switch ( this.scanningMode ) {
         case 'add':
           this.$router.push('/additem')
